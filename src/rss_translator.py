@@ -59,16 +59,16 @@ def process_feed(url, conn, fg):
             print(f"Translating new entry: {title}")
             trans_title = translate_text(title)
             trans_desc = translate_text(desc)
-            published = entry.get('published', datetime.now().isoformat())
+            published = entry.get('published', datetime.now().astimezone().isoformat())
             
             c.execute("INSERT INTO entries (id, title, link, translated_title, translated_desc, published, fetched_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
                       (entry_id, title, entry.get('link', ''), trans_title, trans_desc, published, time.time()))
             conn.commit()
         else:
             # Already processed
-            trans_title = row[3]
-            trans_desc = row[4]
-            published = row[5]
+            trans_title = row[2]
+            trans_desc = row[3]
+            published = row[4]
             
             # Optionally update fetched_at so active items don't get pruned
             c.execute("UPDATE entries SET fetched_at=? WHERE id=?", (time.time(), entry_id))
@@ -80,7 +80,11 @@ def process_feed(url, conn, fg):
         fe.link(href=entry.get('link', ''))
         fe.description(trans_desc)
         # Use existing published date if parsing fails, or current time
-        fe.published(published)
+        try:
+            fe.published(published)
+        except ValueError:
+            # Handle feeds that provide naive dates which feedgen rejects
+            pass
 
 def main():
     if not os.path.exists(OUTPUT_DIR):
