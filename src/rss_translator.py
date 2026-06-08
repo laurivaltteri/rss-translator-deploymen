@@ -29,16 +29,15 @@ def translate_text(text, target='en'):
         print(f"Translation failed: {e}")
         return text
 
-def process_feed(url, conn):
+def process_feed(url, conn, fg):
     print(f"Fetching feed: {url}")
-    d = feedparser.parse(url)
+    try:
+        d = feedparser.parse(url)
+    except Exception as e:
+        print(f"Failed to parse feed {url}: {e}")
+        return
+        
     c = conn.cursor()
-    
-    fg = FeedGenerator()
-    fg.id(url)
-    fg.title(f"Translated: {d.feed.get('title', 'Unknown Feed')}")
-    fg.link(href=url, rel='self')
-    fg.description("Translated RSS feed using lightweight local pipeline.")
     
     # Process entries
     for entry in d.entries:
@@ -71,8 +70,6 @@ def process_feed(url, conn):
         fe.description(trans_desc)
         # Use existing published date if parsing fails, or current time
         fe.published(published)
-        
-    return fg
 
 def main():
     if not os.path.exists(FEEDS_DIR):
@@ -80,14 +77,30 @@ def main():
         
     conn = init_db()
     
-    # Example feed: Spanish news
-    feed_url = 'http://ep00.epimg.net/rss/elpais/portada.xml'
+    feeds_file = os.path.join(os.path.dirname(__file__), "..", "feeds_list.txt")
+    if not os.path.exists(feeds_file):
+        with open(feeds_file, "w") as f:
+            f.write("# List of RSS feeds to be translated and served\n")
+            f.write("http://ep00.epimg.net/rss/elpais/portada.xml\n")
+            
+    with open(feeds_file, "r") as f:
+        urls = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+        
+    fg = FeedGenerator()
+    fg.id("combined-translated-feed")
+    fg.title("Combined Translated Feeds")
+    fg.link(href="http://localhost:8080/combined.xml", rel='self')
+    fg.description("Combined and translated RSS feeds using lightweight local pipeline.")
     
-    fg = process_feed(feed_url, conn)
+    for feed_url in urls:
+        process_feed(feed_url, conn, fg)
     
     output_path = os.path.join(FEEDS_DIR, 'combined.xml')
-    fg.atom_file(output_path)
-    print(f"Combined Atom feed written to {output_path}")
+    if len(urls) > 0:
+        fg.atom_file(output_path)
+        print(f"Combined Atom feed written to {output_path}")
+    else:
+        print("No feeds processed. Add URLs to feeds_list.txt")
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,4 @@
+# List of RSS feeds to be translated and served
+# Add one URL per line. Lines starting with # are ignored.
+
+http://ep00.epimg.net/rss/elpais/portada.xml
