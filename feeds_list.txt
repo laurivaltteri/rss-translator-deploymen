@@ -5,18 +5,18 @@ TARGET_LANG=fi
 
 http://ep00.epimg.net/rss/elpais/portada.xml
 https://www.politico.eu/feed/
-https://www.reutersagency.com/feed/?best-topics=world-news&post_type=best
+https://news.google.com/rss/search?q=site%3Areuters.com&hl=en-US&gl=US&ceid=US%3Aen
 https://www.euronews.com/rss
 https://www.lemonde.fr/en/rss/une.xml
-https://www.spiegel.de/ausland/europa/index.rss
-https://rss.dw.com/xml/rss-de-eu
+http://www.spiegel.de/schlagzeilen/rss/0,5291,676,00.xml
+https://rss.dw.com/rdf/rss-en-all
 
 
 # tech
 https://feeds.arstechnica.com/arstechnica/index
 https://hnrss.org/best
-https://www.techinasia.com/feed
-ttps://api.quantamagazine.org/feed/
+https://techinasia.com
+https://www.quantamagazine.org/feed/
 https://www.kdnuggets.com/feed
 https://www.nature.com/neuro.rss
 https://www.wildsnow.com/feed/
