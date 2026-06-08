@@ -1,4 +1,6 @@
 # List of RSS feeds to be translated and served
 # Add one URL per line. Lines starting with # are ignored.
+# You can set the target translation language using TARGET_LANG=<lang_code>
+TARGET_LANG=en
 
 http://ep00.epimg.net/rss/elpais/portada.xml

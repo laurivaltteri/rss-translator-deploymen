@@ -36,7 +36,7 @@ def translate_text(text, target='en'):
         print(f"Translation failed: {e}")
         return text
 
-def process_feed(url, conn, fg):
+def process_feed(url, conn, fg, target_lang='en'):
     print(f"Fetching feed: {url}")
     try:
         d = feedparser.parse(url)
@@ -57,8 +57,8 @@ def process_feed(url, conn, fg):
             title = entry.get('title', '')
             desc = entry.get('description', '')
             print(f"Translating new entry: {title}")
-            trans_title = translate_text(title)
-            trans_desc = translate_text(desc)
+            trans_title = translate_text(title, target_lang)
+            trans_desc = translate_text(desc, target_lang)
             published = entry.get('published', datetime.now().astimezone().isoformat())
             
             c.execute("INSERT INTO entries (id, title, link, translated_title, translated_desc, published, fetched_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -104,8 +104,17 @@ def main():
             f.write("# List of RSS feeds to be translated and served\n")
             f.write("http://ep00.epimg.net/rss/elpais/portada.xml\n")
             
+    target_lang = 'en'
+    urls = []
     with open(feeds_file, "r") as f:
-        urls = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if line.startswith("TARGET_LANG="):
+                target_lang = line.split("=", 1)[1].strip()
+            else:
+                urls.append(line)
         
     fg = FeedGenerator()
     fg.id("combined-translated-feed")
@@ -114,7 +123,7 @@ def main():
     fg.description("Combined and translated RSS feeds using lightweight local pipeline.")
     
     for feed_url in urls:
-        process_feed(feed_url, conn, fg)
+        process_feed(feed_url, conn, fg, target_lang)
     
     output_path = os.path.join(OUTPUT_DIR, 'combined.xml')
     if len(urls) > 0:
