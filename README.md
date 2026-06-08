@@ -18,20 +18,46 @@ For completeness and in case the original heavier architecture is still desired,
 
 ## Getting Started
 
-1. Initialize and install dependencies:
+### 1. Environment Setup & Installation
+
+The project includes setup scripts to install dependencies (Nginx, Python 3, SQLite) and configure the environment:
+
+1. **Install system dependencies**:
    ```bash
    bash scripts/01_install_deps.sh
    ```
-2. Setup the environment:
+
+2. **Setup virtual environment & services**:
+   This will create a Python virtual environment (`.venv`), install required pip packages, create the `feeds/` directory, and link the Nginx configuration.
    ```bash
    bash scripts/02_setup_services.sh
    ```
-3. Run the translation script:
+
+### 2. Configuration (Adding Feeds)
+
+Before running the translator, configure the RSS feeds you want to aggregate and translate:
+1. Open the `feeds_list.txt` file in the root directory.
+2. Add the URLs of the RSS feeds you want to follow, one per line. Lines starting with `#` are ignored as comments.
+
+### 3. Usage
+
+To manually trigger the fetching and translation pipeline:
+1. Activate the virtual environment:
    ```bash
-   cd src
-   python rss_translator.py
+   source .venv/bin/activate
    ```
-4. Check limits and footprint:
+2. Run the translation script:
    ```bash
-   bash scripts/03_profile_limits.sh
+   python src/rss_translator.py
    ```
+
+This will output a single `combined.xml` Atom feed into the `feeds/` directory, which is automatically served by Nginx at `http://localhost:8080/combined.xml`. 
+
+*Tip: For automated usage, you can configure a `cron` job to run the Python script at your desired interval (e.g., every 1 hour).*
+
+### 4. Profiling
+
+To check the exact memory footprints of your components and ensure you are staying within the lightweight constraints:
+```bash
+bash scripts/03_profile_limits.sh
+```
