@@ -6,7 +6,7 @@ import feedparser
 from feedgen.feed import FeedGenerator
 from deep_translator import GoogleTranslator
 
-FEEDS_DIR = os.path.join(os.path.dirname(__file__), "..", "feeds")
+OUTPUT_DIR = "/var/www/html/feeds/"
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "db.sqlite3")
 
 def init_db():
@@ -83,8 +83,8 @@ def process_feed(url, conn, fg):
         fe.published(published)
 
 def main():
-    if not os.path.exists(FEEDS_DIR):
-        os.makedirs(FEEDS_DIR)
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR, exist_ok=True)
         
     conn = init_db()
     
@@ -112,7 +112,7 @@ def main():
     for feed_url in urls:
         process_feed(feed_url, conn, fg)
     
-    output_path = os.path.join(FEEDS_DIR, 'combined.xml')
+    output_path = os.path.join(OUTPUT_DIR, 'combined.xml')
     if len(urls) > 0:
         fg.atom_file(output_path)
         print(f"Combined Atom feed written to {output_path}")

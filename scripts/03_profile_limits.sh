@@ -16,4 +16,4 @@ if [ -f "$PROJECT_ROOT/db.sqlite3" ]; then
 fi
 
 echo -e "\n=== Local Feeds Storage Size ==="
-du -sh "$PROJECT_ROOT/feeds/" || echo "Feeds dir not found"
+du -sh "/var/www/html/feeds/" || echo "Feeds dir not found"

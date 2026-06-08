@@ -10,13 +10,11 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-echo "Setting up local feeds directory..."
-mkdir -p "$PROJECT_ROOT/feeds"
+echo "Setting up /var/www/html/feeds directory..."
+sudo mkdir -p /var/www/html/feeds
+sudo chown -R $USER:www-data /var/www/html/feeds
+sudo chmod -R 775 /var/www/html/feeds
 
 echo "Configuring Nginx..."
-# Create a runtime nginx config with the correct absolute path to the local feeds directory
-sed "s|/var/www/html/feeds|$PROJECT_ROOT/feeds|g" "$PROJECT_ROOT/config/nginx_local.conf" > "$PROJECT_ROOT/config/nginx_runtime.conf"
-sudo ln -sf "$PROJECT_ROOT/config/nginx_runtime.conf" /etc/nginx/sites-enabled/rss_translator.conf
-# Ensure nginx user has access
-sudo chmod +rx "$PROJECT_ROOT/feeds"
+sudo ln -sf "$PROJECT_ROOT/config/nginx_local.conf" /etc/nginx/sites-enabled/rss_translator.conf
 sudo systemctl restart nginx
