@@ -14,6 +14,13 @@ def init_db():
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS entries
                  (id TEXT PRIMARY KEY, title TEXT, link TEXT, translated_title TEXT, translated_desc TEXT, published TEXT)''')
+    
+    # Safely add fetched_at column for DB pruning (if it doesn't already exist)
+    try:
+        c.execute('ALTER TABLE entries ADD COLUMN fetched_at REAL')
+    except sqlite3.OperationalError:
+        pass
+        
     conn.commit()
     return conn
 
@@ -54,14 +61,18 @@ def process_feed(url, conn, fg):
             trans_desc = translate_text(desc)
             published = entry.get('published', datetime.now().isoformat())
             
-            c.execute("INSERT INTO entries (id, title, link, translated_title, translated_desc, published) VALUES (?, ?, ?, ?, ?, ?)",
-                      (entry_id, title, entry.get('link', ''), trans_title, trans_desc, published))
+            c.execute("INSERT INTO entries (id, title, link, translated_title, translated_desc, published, fetched_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                      (entry_id, title, entry.get('link', ''), trans_title, trans_desc, published, time.time()))
             conn.commit()
         else:
             # Already processed
             trans_title = row[3]
             trans_desc = row[4]
             published = row[5]
+            
+            # Optionally update fetched_at so active items don't get pruned
+            c.execute("UPDATE entries SET fetched_at=? WHERE id=?", (time.time(), entry_id))
+            conn.commit()
             
         fe = fg.add_entry()
         fe.id(entry_id)
@@ -76,6 +87,12 @@ def main():
         os.makedirs(FEEDS_DIR)
         
     conn = init_db()
+    
+    # Prune database: delete items that haven't been fetched in the last 30 days
+    thirty_days_ago = time.time() - (30 * 24 * 3600)
+    c = conn.cursor()
+    c.execute("DELETE FROM entries WHERE fetched_at < ?", (thirty_days_ago,))
+    conn.commit()
     
     feeds_file = os.path.join(os.path.dirname(__file__), "..", "feeds_list.txt")
     if not os.path.exists(feeds_file):
