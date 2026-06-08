@@ -20,12 +20,3 @@ sudo ln -sf "$PROJECT_ROOT/config/nginx_runtime.conf" /etc/nginx/sites-enabled/r
 # Ensure nginx user has access
 sudo chmod +rx "$PROJECT_ROOT/feeds"
 sudo systemctl restart nginx
-
-# The following lines setup PostgreSQL and Miniflux for the heavier architecture if required
-# echo "Setting up Postgres and Miniflux (Heavier Architecture)..."
-# sudo -u postgres psql -c "CREATE USER miniflux WITH PASSWORD 'localtest';" || true
-# sudo -u postgres psql -c "CREATE DATABASE miniflux OWNER miniflux;" || true
-# sudo cat "$PROJECT_ROOT/config/postgresql.conf.patch" >> /etc/postgresql/14/main/postgresql.conf
-# sudo systemctl restart postgresql
-# sudo ln -sf "$PROJECT_ROOT/config/miniflux.conf" /etc/miniflux.conf
-# sudo systemctl restart miniflux
