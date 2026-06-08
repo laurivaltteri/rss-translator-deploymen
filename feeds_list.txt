@@ -1,6 +1,22 @@
 # List of RSS feeds to be translated and served
 # Add one URL per line. Lines starting with # are ignored.
 # You can set the target translation language using TARGET_LANG=<lang_code>
-TARGET_LANG=en
+TARGET_LANG=fi
 
 http://ep00.epimg.net/rss/elpais/portada.xml
+https://www.politico.eu/feed/
+https://www.reutersagency.com/feed/?best-topics=world-news&post_type=best
+https://www.euronews.com/rss
+https://www.lemonde.fr/en/rss/une.xml
+https://www.spiegel.de/ausland/europa/index.rss
+https://rss.dw.com/xml/rss-de-eu
+
+
+# tech
+https://feeds.arstechnica.com/arstechnica/index
+https://hnrss.org/best
+https://www.techinasia.com/feed
+ttps://api.quantamagazine.org/feed/
+https://www.kdnuggets.com/feed
+https://www.nature.com/neuro.rss
+https://www.wildsnow.com/feed/

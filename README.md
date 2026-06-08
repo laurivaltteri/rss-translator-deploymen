@@ -48,8 +48,12 @@ To manually trigger the fetching and translation pipeline:
 
 This will output a single `combined.xml` Atom feed into the `feeds/` directory, which is automatically served by Nginx at `http://localhost:8080/combined.xml`. 
 
-*Tip: For automated usage, you can configure a `cron` job to run the Python script at your desired interval (e.g., every 1 hour).*
+*Tip: For automated usage, you can configure a `cron` job to run the included wrapper script at your desired interval (e.g., every 1 hour).*
 
+```bash
+# Example: Run every hour
+0 * * * * /absolute/path/to/rss-translator-deployment/scripts/run_translator_cron.sh >> /var/log/rss_translator.log 2>&1
+```
 ### 4. Profiling
 
 To check the exact memory footprints of your components and ensure you are staying within the lightweight constraints:
